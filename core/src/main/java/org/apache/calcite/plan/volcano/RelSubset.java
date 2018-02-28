@@ -129,11 +129,17 @@ public class RelSubset extends AbstractRelNode {
     final RelMetadataQuery mq = getCluster().getMetadataQuery();
     for (RelNode rel : getRels()) {
       final RelOptCost cost = planner.getCost(rel, mq);
-      if (cost.isLt(bestCost)) {
+      if (isCheaperThanBest(rel, cost)) {
         bestCost = cost;
         best = rel;
       }
     }
+  }
+
+  private boolean isCheaperThanBest(final RelNode rel, final RelOptCost cost) {
+    return cost.isLt(bestCost)
+            || (cost.isLe(bestCost) && best != null
+              && rel.toString().length() < best.toString().length());
   }
 
   public RelNode getBest() {
@@ -332,7 +338,7 @@ public class RelSubset extends AbstractRelNode {
     }
     try {
       final RelOptCost cost = planner.getCost(rel, mq);
-      if (cost.isLt(bestCost)) {
+      if (isCheaperThanBest(rel, cost)) {
         LOGGER.trace("Subset cost improved: subset [{}] cost was {} now {}", this, bestCost, cost);
 
         bestCost = cost;
