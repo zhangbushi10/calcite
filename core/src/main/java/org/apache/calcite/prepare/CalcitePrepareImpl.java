@@ -132,7 +132,6 @@ import org.apache.calcite.sql2rel.SqlRexConvertletTable;
 import org.apache.calcite.sql2rel.SqlToRelConverter;
 import org.apache.calcite.sql2rel.StandardConvertletTable;
 import org.apache.calcite.tools.Frameworks;
-import org.apache.calcite.tools.RelUtils;
 import org.apache.calcite.util.ImmutableIntList;
 import org.apache.calcite.util.Pair;
 import org.apache.calcite.util.Util;
@@ -1252,12 +1251,14 @@ public class CalcitePrepareImpl implements CalcitePrepare {
     }
 
     @Override protected PreparedResult implement(RelRoot root) {
+/*
       if (RelUtils.findOLAPRel(root.rel)
               && !root.rel.getClass().getName().contains("OLAPToEnumerableConverter")) {
         String dumpPlan = RelOptUtil.dumpPlan("", root.rel,
                 false, SqlExplainLevel.DIGEST_ATTRIBUTES);
         throw new IllegalArgumentException("Error planer:" + dumpPlan);
       }
+*/
       RelDataType resultType = root.rel.getRowType();
       boolean isDml = root.kind.belongsTo(SqlKind.DML);
       final Bindable bindable;
