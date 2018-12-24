@@ -328,7 +328,8 @@ public abstract class FilterJoinRule extends RelOptRule {
 
     @Override public void onMatch(RelOptRuleCall call) {
       Join join = call.rel(0);
-      perform(call, null, join);
+      // HACK POINT
+//      perform(call, null, join);
     }
   }
 
@@ -355,7 +356,8 @@ public abstract class FilterJoinRule extends RelOptRule {
     @Override public void onMatch(RelOptRuleCall call) {
       Filter filter = call.rel(0);
       Join join = call.rel(1);
-      perform(call, filter, join);
+      // HACK POINT
+//      perform(call, filter, join);
     }
   }
 
