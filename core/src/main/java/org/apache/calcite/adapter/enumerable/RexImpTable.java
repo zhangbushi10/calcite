@@ -2110,7 +2110,10 @@ public class RexImpTable {
 
         return ifTrue == null || ifFalse == null
             ? Util.first(ifTrue, ifFalse)
-            : Expressions.condition(test, ifTrue, ifFalse);
+        // : Expressions.condition(test, ifTrue, ifFalse);
+        // the expression behind then should not be isolated with its condition,
+        // otherwise exceptions may happen, like Division Undefined
+            : Expressions.condition(test, translator.translateToInit(ifTrue), translator.translateToInit(ifFalse));
       }
     }
   }

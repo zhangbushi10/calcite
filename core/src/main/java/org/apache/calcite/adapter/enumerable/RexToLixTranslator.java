@@ -16,16 +16,20 @@
  */
 package org.apache.calcite.adapter.enumerable;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.apache.calcite.DataContext;
 import org.apache.calcite.adapter.java.JavaTypeFactory;
 import org.apache.calcite.avatica.util.ByteString;
 import org.apache.calcite.avatica.util.DateTimeUtils;
 import org.apache.calcite.linq4j.function.Function1;
+import org.apache.calcite.linq4j.tree.BinaryExpression;
 import org.apache.calcite.linq4j.tree.BlockBuilder;
 import org.apache.calcite.linq4j.tree.ConstantExpression;
 import org.apache.calcite.linq4j.tree.Expression;
 import org.apache.calcite.linq4j.tree.ExpressionType;
 import org.apache.calcite.linq4j.tree.Expressions;
+import org.apache.calcite.linq4j.tree.MethodCallExpression;
 import org.apache.calcite.linq4j.tree.ParameterExpression;
 import org.apache.calcite.linq4j.tree.Primitive;
 import org.apache.calcite.linq4j.tree.UnaryExpression;
@@ -53,6 +57,7 @@ import org.apache.calcite.util.Util;
 
 import com.google.common.collect.ImmutableMap;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -1254,6 +1259,35 @@ public class RexToLixTranslator {
 
   public Expression getRoot() {
     return root;
+  }
+
+  public Expression translateToInit(Expression expr) {
+    return translateToInit(list.getParameterExpressionMap(), expr);
+  }
+
+  /**
+   * get the initial expression of parameter expression started with 'v'
+   * */
+  private Expression translateToInit(final Map<ParameterExpression, Expression> paramExprMap, Expression expr) {
+    Expression result = expr;
+    if (expr instanceof ParameterExpression && expr.toString().startsWith("v") && paramExprMap.containsKey(expr)) {
+      result = translateToInit(paramExprMap, paramExprMap.get(expr));
+    } else if (expr instanceof BinaryExpression) {
+      BinaryExpression biExpr = (BinaryExpression) expr;
+      Expression expr0 = translateToInit(paramExprMap, biExpr.expression0);
+      Expression expr1 = translateToInit(paramExprMap, biExpr.expression1);
+      result = Expressions.makeBinary(biExpr.nodeType, expr0, expr1);
+    } else if (expr instanceof MethodCallExpression) {
+      List<Expression> innerExprs = Lists.transform(((MethodCallExpression) expr).expressions, new Function<Expression, Expression>() {
+        @Nullable
+        @Override
+        public Expression apply(@Nullable Expression input) {
+          return translateToInit(paramExprMap, input);
+        }
+      });
+      result = Expressions.call(((MethodCallExpression) expr).method, innerExprs);
+    }
+    return result;
   }
 
   /** Translates a field of an input to an expression. */

@@ -72,6 +72,14 @@ public class BlockBuilder {
     this.parent = parent;
   }
 
+  public Map<ParameterExpression, Expression> getParameterExpressionMap() {
+    Map<ParameterExpression, Expression> result = new HashMap<>();
+    for(DeclarationStatement dState : expressionForReuse.values()) {
+      result.put(dState.parameter, dState.initializer);
+    }
+    return result;
+  }
+
   /**
    * Clears this BlockBuilder.
    */
