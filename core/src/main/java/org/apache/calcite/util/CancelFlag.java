@@ -35,7 +35,7 @@ public class CancelFlag {
    * Feel free to use the flag directly. */
   public final AtomicBoolean atomicBoolean;
 
-  public static final ThreadLocal<CancelFlag> contextCancelFlag = ThreadLocal.withInitial(new Supplier<CancelFlag>() {
+  private static final ThreadLocal<CancelFlag> contextCancelFlag = ThreadLocal.withInitial(new Supplier<CancelFlag>() {
     @Override
     public CancelFlag get() {
       return new CancelFlag(new AtomicBoolean(false));
@@ -47,6 +47,10 @@ public class CancelFlag {
   }
 
   //~ Methods ----------------------------------------------------------------
+
+  public static CancelFlag getContextCancelFlag() {
+      return contextCancelFlag.get();
+  }
 
   /**
    * @return whether a cancellation has been requested
