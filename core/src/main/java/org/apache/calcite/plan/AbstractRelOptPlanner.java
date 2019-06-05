@@ -89,7 +89,7 @@ public abstract class AbstractRelOptPlanner implements RelOptPlanner {
 
     CancelFlag cancelFlag = context.unwrap(CancelFlag.class);
     if (cancelFlag == null) {
-      cancelFlag = CancelFlag.contextCancelFlag.get();
+      cancelFlag = CancelFlag.getContextCancelFlag();
     }
     this.cancelFlag = cancelFlag.atomicBoolean;
     this.cancelFlag.set(false);
