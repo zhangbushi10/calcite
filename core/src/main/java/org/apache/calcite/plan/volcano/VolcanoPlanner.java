@@ -1833,6 +1833,7 @@ public class VolcanoPlanner extends AbstractRelOptPlanner {
   }
 
   /**
+   * Reference to https://issues.apache.org/jira/browse/CALCITE-2223
    * Excludes input {@code RelNode} from use in rules in case it creates cycles in the planning
    * cluster. {@link AbstractConverter} are allowed to form cycles since no rules should use
    * on {@link AbstractConverter} operands.
