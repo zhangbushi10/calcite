@@ -1877,7 +1877,10 @@ public class VolcanoPlanner extends AbstractRelOptPlanner {
         return true;
       }
       assert input instanceof RelSubset
-              : "input of a registered node " + rel + " should be RelSubset. Actual input is " + input;
+              : "input of a registered node "
+                + rel
+                + " should be RelSubset. Actual input is "
+                + input;
       visitedNodes.put((RelSubset) input, shouldNotReach);
     }
     visitedNodes.put(relSubset, shouldNotReach);
