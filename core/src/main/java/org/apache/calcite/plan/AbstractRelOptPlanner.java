@@ -87,9 +87,12 @@ public abstract class AbstractRelOptPlanner implements RelOptPlanner {
     }
     this.context = context;
 
-    final CancelFlag cancelFlag = context.unwrap(CancelFlag.class);
-    this.cancelFlag = cancelFlag != null ? cancelFlag.atomicBoolean
-        : new AtomicBoolean();
+    CancelFlag cancelFlag = context.unwrap(CancelFlag.class);
+    if (cancelFlag == null) {
+      cancelFlag = CancelFlag.getContextCancelFlag();
+    }
+    this.cancelFlag = cancelFlag.atomicBoolean;
+    this.cancelFlag.set(false);
 
     // Add abstract RelNode classes. No RelNodes will ever be registered with
     // these types, but some operands may use them.
@@ -120,6 +123,7 @@ public abstract class AbstractRelOptPlanner implements RelOptPlanner {
    */
   public void checkCancel() {
     if (cancelFlag.get()) {
+      cancelFlag.set(false);
       throw RESOURCE.preparationAborted().ex();
     }
   }
