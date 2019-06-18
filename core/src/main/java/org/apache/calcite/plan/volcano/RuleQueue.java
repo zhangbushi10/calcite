@@ -549,18 +549,28 @@ class RuleQueue {
    */
   private void checkDuplicateSubsets(Deque<RelSubset> subsets,
       RelOptRuleOperand operand, RelNode[] rels) {
-    final RelSubset subset = planner.getSubset(rels[operand.ordinalInRule]);
+    final RelNode rel = rels[operand.ordinalInRule];
+    final RelSubset subset = planner.getSubset(rel);
     if (subsets.contains(subset)) {
       throw Util.FoundOne.NULL;
     }
+
+    subsets.push(subset);
+    for (RelNode input: rel.getInputs()) {
+      if (subsets.contains(planner.getSubset(input))) {
+        throw Util.FoundOne.NULL;
+      }
+    }
+
     if (!operand.getChildOperands().isEmpty()) {
       subsets.push(subset);
       for (RelOptRuleOperand childOperand : operand.getChildOperands()) {
         checkDuplicateSubsets(subsets, childOperand, rels);
       }
-      final RelSubset x = subsets.pop();
-      assert x == subset;
     }
+
+    final RelSubset x = subsets.pop();
+    assert x == subset;
   }
 
   /**
