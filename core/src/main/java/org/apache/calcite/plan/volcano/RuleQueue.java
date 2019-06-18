@@ -563,12 +563,10 @@ class RuleQueue {
     }
 
     if (!operand.getChildOperands().isEmpty()) {
-      subsets.push(subset);
       for (RelOptRuleOperand childOperand : operand.getChildOperands()) {
         checkDuplicateSubsets(subsets, childOperand, rels);
       }
     }
-
     final RelSubset x = subsets.pop();
     assert x == subset;
   }
