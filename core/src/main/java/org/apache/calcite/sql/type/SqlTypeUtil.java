@@ -1267,6 +1267,12 @@ public abstract class SqlTypeUtil {
         return true;
       }
     }
+    
+    // HACK POINT: implicitly convert date to timestamp
+    if ((family1 == SqlTypeFamily.DATE && family2 == SqlTypeFamily.TIMESTAMP)
+            || (family1 == SqlTypeFamily.TIMESTAMP && family2 == SqlTypeFamily.DATE)) {
+      return true;
+    }
 
     return false;
   }
