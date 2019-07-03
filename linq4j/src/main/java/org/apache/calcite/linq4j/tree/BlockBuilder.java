@@ -237,6 +237,15 @@ public class BlockBuilder {
       Type type = ((NewExpression) expr).type;
       return BigDecimal.class.equals(type);
     }
+    if (expr instanceof MethodCallExpression) {
+      MethodCallExpression methodCallExpr = (MethodCallExpression) expr;
+      if (methodCallExpr.method.getName().equals("divide")
+              || methodCallExpr.method.getName().equals("plus")
+              || methodCallExpr.method.getName().equals("multiply")
+              || methodCallExpr.method.getName().equals("minus")) {
+        return true;
+      }
+    }
     return false;
   }
 
