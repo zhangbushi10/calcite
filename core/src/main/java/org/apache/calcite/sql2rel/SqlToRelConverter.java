@@ -1159,15 +1159,22 @@ public class SqlToRelConverter {
 
       if (query instanceof SqlNodeList) {
         SqlNodeList valueList = (SqlNodeList) query;
-        if (!containsNullLiteral(valueList)
-            && valueList.size() < config.getInSubQueryThreshold()) {
+        if (!containsNullLiteral(valueList)) {
+          subQuery.expr = null;
+          // keep in clause.
+          if (Boolean.valueOf(System.getProperty("calcite.keep-in-clause", "false"))) {
+            subQuery.expr = constructIn(bb, leftKeys, valueList, call.getOperator().kind);
+          }
+
           // We're under the threshold, so convert to OR.
-          subQuery.expr =
+          if (subQuery.expr == null && valueList.size() < config.getInSubQueryThreshold()) {
+            subQuery.expr =
               convertInToOr(
-                  bb,
-                  leftKeys,
-                  valueList,
-                  (SqlInOperator) call.getOperator());
+                bb,
+                leftKeys,
+                valueList,
+                (SqlInOperator) call.getOperator());
+          }
           return;
         }
 
@@ -1302,6 +1309,24 @@ public class SqlToRelConverter {
     default:
       throw new AssertionError("unexpected kind of sub-query: "
           + subQuery.node);
+    }
+  }
+
+  private RexNode constructIn(Blackboard bb, List<RexNode> leftKeys, SqlNodeList valuesList,
+      SqlKind kind) {
+    List<RexNode> listRexNodes = new ArrayList<>(leftKeys);
+    for (SqlNode node : valuesList) {
+      listRexNodes.add(bb.convertExpression(node));
+    }
+
+    switch (kind) {
+    case NOT_IN:
+      return rexBuilder.makeCall(SqlStdOperatorTable.NOT_IN, listRexNodes);
+    case IN:
+    case SOME:
+      return rexBuilder.makeCall(SqlStdOperatorTable.IN, listRexNodes);
+    default:
+      return null;
     }
   }
 
