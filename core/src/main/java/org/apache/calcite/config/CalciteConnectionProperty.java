@@ -136,6 +136,10 @@ public enum CalciteConnectionProperty implements ConnectionProperty {
    * default constructor or an {@code INSTANCE} constant. */
   TYPE_SYSTEM("typeSystem", Type.PLUGIN, null, false),
 
+  /* OVERRIDE POINT */
+  // https://github.com/Kyligence/KAP/issues/10964
+  PROJECT_UNDER_RELROOT("projectUnderRelRoot", Type.BOOLEAN, true, false),
+
   /** SQL conformance level. */
   CONFORMANCE("conformance", Type.ENUM, SqlConformanceEnum.DEFAULT, false);
 

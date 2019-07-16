@@ -179,6 +179,13 @@ public class CalciteConnectionConfigImpl extends ConnectionConfigImpl
     return CalciteConnectionProperty.CONFORMANCE.wrap(properties)
         .getEnum(SqlConformanceEnum.class);
   }
+
+  /* OVERRIDE POINT */
+  // https://github.com/Kyligence/KAP/issues/10964
+  public boolean projectUnderRelRoot() {
+    return CalciteConnectionProperty.PROJECT_UNDER_RELROOT.wrap(properties)
+            .getBoolean(true);
+  }
 }
 
 // End CalciteConnectionConfigImpl.java

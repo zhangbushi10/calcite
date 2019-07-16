@@ -68,6 +68,10 @@ public interface CalciteConnectionConfig extends ConnectionConfig {
   <T> T typeSystem(Class<T> typeSystemClass, T defaultTypeSystem);
   /** @see CalciteConnectionProperty#CONFORMANCE */
   SqlConformance conformance();
+
+  /* OVERRIDE POINT */
+  // https://github.com/Kyligence/KAP/issues/10964
+  boolean projectUnderRelRoot();
 }
 
 // End CalciteConnectionConfig.java
