@@ -212,14 +212,16 @@ public class SqlDataTypeSpec extends SqlNode {
         writer.endList(frame);
       }
 
-      if (charSetName != null) {
-        writer.keyword("CHARACTER SET");
-        writer.identifier(charSetName);
-      }
-
-      if (collectionsTypeName != null) {
-        writer.keyword(collectionsTypeName.getSimple());
-      }
+      // https://github.com/Kyligence/KAP/issues/12975
+      // Remove charsetName/collectionsTypeName on sql unparse for CC
+//      if (charSetName != null) {
+//        writer.keyword("CHARACTER SET");
+//        writer.identifier(charSetName);
+//      }
+//
+//      if (collectionsTypeName != null) {
+//        writer.keyword(collectionsTypeName.getSimple());
+//      }
     } else if (name.startsWith("_")) {
       // We're generating a type for an alien system. For example,
       // UNSIGNED is a built-in type in MySQL.
