@@ -142,7 +142,7 @@ public class OLAPJoinPushThroughJoinRule extends RelOptRule {
     RexNode newBottomCondition = RexUtil.composeConjunction(rexBuilder,
             newBottomList, false);
     final Join newBottomJoin = bottomJoin.copy(bottomJoin.getTraitSet(),
-            newBottomCondition, relA, relC, bottomJoin.getJoinType(), bottomJoin.isSemiJoinDone());
+            newBottomCondition, relA, relC, topJoin.getJoinType(), bottomJoin.isSemiJoinDone());
 
     // target: | A       | C      | B |
     // source: | A       | B | C      |
@@ -157,7 +157,7 @@ public class OLAPJoinPushThroughJoinRule extends RelOptRule {
     RexNode newTopCondition = RexUtil.composeConjunction(rexBuilder, newTopList, false);
     @SuppressWarnings("SuspiciousNameCombination")
     final Join newTopJoin = topJoin.copy(topJoin.getTraitSet(), newTopCondition, newBottomJoin,
-            relB, topJoin.getJoinType(), topJoin.isSemiJoinDone());
+            relB, bottomJoin.getJoinType(), topJoin.isSemiJoinDone());
 
     assert !Mappings.isIdentity(topMapping);
     final RelBuilder relBuilder = call.builder();
