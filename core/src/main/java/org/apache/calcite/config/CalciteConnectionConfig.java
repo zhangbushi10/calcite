@@ -21,6 +21,7 @@ import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.avatica.util.Quoting;
 import org.apache.calcite.model.JsonSchema;
 import org.apache.calcite.sql.validate.SqlConformance;
+import org.apache.calcite.sql2rel.ReflectiveConvertletTable;
 
 /** Interface for reading connection properties within Calcite code. There is
  * a method for every property. At some point there will be similar config
@@ -72,6 +73,10 @@ public interface CalciteConnectionConfig extends ConnectionConfig {
   /* OVERRIDE POINT */
   // https://github.com/Kyligence/KAP/issues/10964
   boolean projectUnderRelRoot();
+
+  /* OVERRIDE POINT */
+  // https://github.com/Kyligence/KAP/issues/13473
+  ReflectiveConvertletTable convertletTable();
 }
 
 // End CalciteConnectionConfig.java

@@ -131,7 +131,6 @@ import org.apache.calcite.sql.validate.SqlConformance;
 import org.apache.calcite.sql.validate.SqlValidator;
 import org.apache.calcite.sql2rel.SqlRexConvertletTable;
 import org.apache.calcite.sql2rel.SqlToRelConverter;
-import org.apache.calcite.sql2rel.StandardConvertletTable;
 import org.apache.calcite.tools.Frameworks;
 import org.apache.calcite.tools.RelUtils;
 import org.apache.calcite.util.ImmutableIntList;
@@ -323,7 +322,7 @@ public class CalcitePrepareImpl implements CalcitePrepare {
     final CalcitePreparingStmt preparingStmt =
         new CalcitePreparingStmt(this, context, catalogReader, typeFactory,
             context.getRootSchema(), null, planner, resultConvention,
-            createConvertletTable());
+            createConvertletTable(context));
     final SqlToRelConverter converter =
         preparingStmt.getSqlToRelConverter(validator, catalogReader,
             configBuilder.build());
@@ -482,9 +481,10 @@ public class CalcitePrepareImpl implements CalcitePrepare {
     return SqlParser.configBuilder();
   }
 
-  /** Factory method for default convertlet table. */
-  protected SqlRexConvertletTable createConvertletTable() {
-    return StandardConvertletTable.INSTANCE;
+  /** Factory method for default convertlet table.
+   * @param context context*/
+  protected SqlRexConvertletTable createConvertletTable(Context context) {
+    return context.config().convertletTable();
   }
 
   /** Factory method for cluster. */
@@ -747,7 +747,7 @@ public class CalcitePrepareImpl implements CalcitePrepare {
     final CalcitePreparingStmt preparingStmt =
         new CalcitePreparingStmt(this, context, catalogReader, typeFactory,
             context.getRootSchema(), prefer, planner, resultConvention,
-            createConvertletTable());
+            createConvertletTable(context));
 
     final RelDataType x;
     final Prepare.PreparedResult preparedResult;
@@ -1026,7 +1026,7 @@ public class CalcitePrepareImpl implements CalcitePrepare {
               context.config());
       final CalciteMaterializer materializer =
           new CalciteMaterializer(this, context, catalogReader, schema, planner,
-              createConvertletTable());
+              createConvertletTable(context));
       materializer.populate(materialization);
     } catch (Exception e) {
       throw new RuntimeException("While populating materialization "

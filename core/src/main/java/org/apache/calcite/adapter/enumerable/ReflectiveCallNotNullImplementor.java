@@ -22,6 +22,7 @@ import org.apache.calcite.rex.RexCall;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -48,7 +49,15 @@ public class ReflectiveCallNotNullImplementor implements NotNullImplementor {
     translatedOperands =
         EnumUtils.fromInternal(method.getParameterTypes(), translatedOperands);
     if ((method.getModifiers() & Modifier.STATIC) != 0) {
-      return Expressions.call(method, translatedOperands);
+      /* OVERRIDE POINT */
+      // https://github.com/Kyligence/KAP/issues/13473
+      Expression expr = Expressions.call(method, translatedOperands);
+      if (method.getDeclaringClass().getName()
+              .equals("org.apache.kylin.query.udf.DivideUDF")) {
+        Type clz = translator.typeFactory.getJavaClass(call.getType());
+        expr = RexToLixTranslator.convert(expr, clz);
+      }
+      return expr;
     } else {
       // The UDF class must have a public zero-args constructor.
       // Assume that the validator checked already.

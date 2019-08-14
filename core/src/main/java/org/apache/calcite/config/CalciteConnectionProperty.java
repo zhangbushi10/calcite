@@ -140,6 +140,10 @@ public enum CalciteConnectionProperty implements ConnectionProperty {
   // https://github.com/Kyligence/KAP/issues/10964
   PROJECT_UNDER_RELROOT("projectUnderRelRoot", Type.BOOLEAN, true, false),
 
+  /* OVERRIDE POINT */
+  // https://github.com/Kyligence/KAP/issues/13473
+  CONVERTLET_TABLE("convertletTable", Type.PLUGIN, null, false),
+
   /** SQL conformance level. */
   CONFORMANCE("conformance", Type.ENUM, SqlConformanceEnum.DEFAULT, false);
 

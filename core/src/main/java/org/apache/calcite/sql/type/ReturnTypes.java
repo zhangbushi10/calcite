@@ -483,6 +483,22 @@ public abstract class ReturnTypes {
   public static final SqlReturnTypeInference QUOTIENT_NULLABLE =
       chain(
           DECIMAL_QUOTIENT_NULLABLE, ARG0_INTERVAL_NULLABLE, LEAST_RESTRICTIVE);
+
+  /* OVERRIDE POINT */
+  static final SqlReturnTypeInference DECIMAL_QUOTIENT_FORCE_NULLABLE =
+          cascade(DECIMAL_QUOTIENT, SqlTypeTransforms.FORCE_NULLABLE);
+
+  static final SqlReturnTypeInference ARG0_INTERVAL_FORCE_NULLABLE =
+          cascade(ARG0_INTERVAL, SqlTypeTransforms.FORCE_NULLABLE);
+
+  static final SqlReturnTypeInference LEAST_RESTRICTIVE_FORCE_NULLABLE =
+          cascade(LEAST_RESTRICTIVE, SqlTypeTransforms.FORCE_NULLABLE);
+
+  public static final SqlReturnTypeInference QUOTIENT_FORCE_NULLABLE =
+          chain(
+                  DECIMAL_QUOTIENT_FORCE_NULLABLE,
+                  ARG0_INTERVAL_FORCE_NULLABLE, LEAST_RESTRICTIVE_FORCE_NULLABLE);
+
   /**
    * Type-inference strategy whereby the result type of a call is the decimal
    * sum of two exact numeric operands where at least one of the operands is a

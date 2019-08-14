@@ -28,6 +28,8 @@ import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.util.ChainedSqlOperatorTable;
 import org.apache.calcite.sql.validate.SqlConformance;
 import org.apache.calcite.sql.validate.SqlConformanceEnum;
+import org.apache.calcite.sql2rel.ReflectiveConvertletTable;
+import org.apache.calcite.sql2rel.StandardConvertletTable;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -185,6 +187,13 @@ public class CalciteConnectionConfigImpl extends ConnectionConfigImpl
   public boolean projectUnderRelRoot() {
     return CalciteConnectionProperty.PROJECT_UNDER_RELROOT.wrap(properties)
             .getBoolean(true);
+  }
+
+  /* OVERRIDE POINT */
+  // https://github.com/Kyligence/KAP/issues/13473
+  public ReflectiveConvertletTable convertletTable() {
+    return CalciteConnectionProperty.CONVERTLET_TABLE.wrap(properties)
+            .getPlugin(ReflectiveConvertletTable.class, StandardConvertletTable.INSTANCE);
   }
 }
 

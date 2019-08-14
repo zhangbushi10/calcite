@@ -244,13 +244,14 @@ public class SqlStdOperatorTable extends ReflectiveSqlOperatorTable {
   /**
    * Arithmetic division operator, '<code>/</code>'.
    */
+  /* OVERRIDE POINT */
   public static final SqlBinaryOperator DIVIDE =
       new SqlBinaryOperator(
           "/",
           SqlKind.DIVIDE,
           60,
           true,
-          ReturnTypes.QUOTIENT_NULLABLE,
+          ReturnTypes.QUOTIENT_FORCE_NULLABLE,
           InferTypes.FIRST_KNOWN,
           OperandTypes.DIVISION_OPERATOR);
 

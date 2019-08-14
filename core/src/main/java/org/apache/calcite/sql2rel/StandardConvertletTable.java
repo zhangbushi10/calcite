@@ -94,7 +94,7 @@ public class StandardConvertletTable extends ReflectiveConvertletTable {
 
   //~ Constructors -----------------------------------------------------------
 
-  private StandardConvertletTable() {
+  protected StandardConvertletTable() {
     super();
 
     // Register aliases (operators which have a different name but
