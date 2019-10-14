@@ -153,7 +153,28 @@ public abstract class SqlCall extends SqlNode {
     if (!this.getOperator().getName().equalsIgnoreCase(that.getOperator().getName())) {
       return litmus.fail("{} != {}", this, node);
     }
-    return equalDeep(this.getOperandList(), that.getOperandList(), litmus);
+
+    if (!equalDeep(this.getOperandList(), that.getOperandList(), litmus)) {
+      return litmus.fail("{} != {}", this, node);
+    }
+
+    // this: count(distinct col)
+    // that: count(col)
+    // return false
+    if (this.getFunctionQuantifier() != null
+            && this.getFunctionQuantifier().value == SqlSelectKeyword.DISTINCT) {
+      return this.getFunctionQuantifier().equalsDeep(that.getFunctionQuantifier(), litmus);
+    }
+
+    // this: count(col)
+    // that: count(distinct col)
+    // return false
+    if (that.getFunctionQuantifier() != null
+            && that.getFunctionQuantifier().value == SqlSelectKeyword.DISTINCT) {
+      return that.getFunctionQuantifier().equalsDeep(this.getFunctionQuantifier(), litmus);
+    }
+
+    return litmus.succeed();
   }
 
   /**
