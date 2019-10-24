@@ -1390,7 +1390,9 @@ public class SqlStdOperatorTable extends ReflectiveSqlOperatorTable {
       new SqlFunction(
           "MOD",
           SqlKind.MOD,
-          ReturnTypes.ARG1_NULLABLE,
+          /* OVERRIDE POINT */
+          //https://github.com/Kyligence/KAP/issues/10707
+          ReturnTypes.ARG0_NULLABLE,
           null,
           OperandTypes.EXACT_NUMERIC_EXACT_NUMERIC,
           SqlFunctionCategory.NUMERIC);
