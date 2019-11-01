@@ -234,7 +234,7 @@ public class SqlToRelConverter {
   /** Size of the smallest IN list that will be converted to a semijoin to a
    * static table. */
   /* OVERRIDE POINT */
-  public static final int DEFAULT_IN_SUB_QUERY_THRESHOLD = Integer.MAX_VALUE;
+  public static final int DEFAULT_IN_SUB_QUERY_THRESHOLD = 20;
 
   @Deprecated // to be removed before 2.0
   public static final int DEFAULT_IN_SUBQUERY_THRESHOLD =
@@ -1160,16 +1160,23 @@ public class SqlToRelConverter {
 
       if (query instanceof SqlNodeList) {
         SqlNodeList valueList = (SqlNodeList) query;
-        if (!containsNullLiteral(valueList)
-            && valueList.size() < config.getInSubQueryThreshold()) {
+        if (!containsNullLiteral(valueList)) {
+          subQuery.expr = null;
+          // keep in clause
+          if (Boolean.valueOf(System.getProperty("calcite.keep-in-clause", "false"))) {
+            subQuery.expr = constructIn(bb, leftKeys, valueList, call.getOperator().kind);
+            return;
+          }
           // We're under the threshold, so convert to OR.
-          subQuery.expr =
-              convertInToOr(
-                  bb, leftKeyNode,
-                  leftKeys,
-                  valueList,
-                  (SqlInOperator) call.getOperator());
-          return;
+          if (subQuery.expr == null && valueList.size() < config.getInSubQueryThreshold()) {
+            subQuery.expr =
+                    convertInToOr(
+                            bb, leftKeyNode,
+                            leftKeys,
+                            valueList,
+                            (SqlInOperator) call.getOperator());
+            return;
+          }
         }
 
         // Otherwise, let convertExists translate
@@ -1303,6 +1310,24 @@ public class SqlToRelConverter {
     default:
       throw new AssertionError("unexpected kind of sub-query: "
           + subQuery.node);
+    }
+  }
+
+  private RexNode constructIn(Blackboard bb, List<RexNode> leftKeys, SqlNodeList valuesList,
+                              SqlKind kind) {
+    List<RexNode> listRexNodes = new ArrayList<>(leftKeys);
+    for (SqlNode node : valuesList) {
+      listRexNodes.add(bb.convertExpression(node));
+    }
+
+    switch (kind) {
+    case NOT_IN:
+      return rexBuilder.makeCall(SqlStdOperatorTable.NOT_IN, listRexNodes);
+    case IN:
+    case SOME:
+      return rexBuilder.makeCall(SqlStdOperatorTable.IN, listRexNodes);
+    default:
+      return null;
     }
   }
 
@@ -5767,7 +5792,6 @@ public class SqlToRelConverter {
     public boolean isDecorrelationEnabled() {
       return decorrelationEnabled;
     }
-
     public boolean isTrimUnusedFields() {
       return trimUnusedFields;
     }
