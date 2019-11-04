@@ -31,6 +31,7 @@ import org.apache.calcite.sql.validate.SqlConformanceEnum;
 import org.apache.calcite.sql2rel.ReflectiveConvertletTable;
 import org.apache.calcite.sql2rel.StandardConvertletTable;
 
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Properties;
@@ -105,6 +106,17 @@ public class CalciteConnectionConfigImpl extends ConnectionConfigImpl
     switch (s) {
     case "standard":
       tables.add(SqlStdOperatorTable.instance());
+      return;
+    case "kylin":
+      SqlOperatorTable instance;
+      try {
+        Class clz = Class.forName("org.apache.kylin.query.calcite.KylinOperatorTable");
+        Field field = clz.getField("INSTANCE");
+        instance = (SqlOperatorTable) field.get(null);
+        tables.add(instance);
+      } catch (Exception e) {
+        //ignore
+      }
       return;
     case "oracle":
       tables.add(OracleSqlOperatorTable.instance());
