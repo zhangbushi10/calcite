@@ -266,7 +266,7 @@ public class SqlStdOperatorTable extends ReflectiveSqlOperatorTable {
           SqlKind.MOD,
           60,
           true,
-          ReturnTypes.ARG1_NULLABLE,
+          ReturnTypes.LEAST_RESTRICTIVE,
           null,
           OperandTypes.EXACT_NUMERIC_EXACT_NUMERIC);
 
@@ -1385,7 +1385,7 @@ public class SqlStdOperatorTable extends ReflectiveSqlOperatorTable {
       new SqlFunction(
           "MOD",
           SqlKind.MOD,
-          ReturnTypes.ARG1_NULLABLE,
+          ReturnTypes.LEAST_RESTRICTIVE,
           null,
           OperandTypes.EXACT_NUMERIC_EXACT_NUMERIC,
           SqlFunctionCategory.NUMERIC);
