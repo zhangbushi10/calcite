@@ -174,6 +174,8 @@ public class CalcitePrepareImpl implements CalcitePrepare {
 
   public static final ThreadLocal<Boolean> KYLIN_ONLY_PREPARE = new ThreadLocal<>();
 
+  public static final ThreadLocal<Integer> KEEP_IN_CLAUSE_THRESHOLD = new ThreadLocal<>();
+
   public static final boolean COMMUTE =
       Util.getBooleanProperty("calcite.enable.join.commute");
 
