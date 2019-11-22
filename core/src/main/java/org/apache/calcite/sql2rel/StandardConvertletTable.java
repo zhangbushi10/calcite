@@ -1234,18 +1234,23 @@ public class StandardConvertletTable extends ReflectiveConvertletTable {
           SqlStdOperatorTable.SUM.createCall(pos, arg);
       final RexNode sumRex = cx.convertExpression(sum);
       final SqlNode sumCast;
-      if (!sumRex.getType().equals(avgType)) {
-        sumCast = SqlStdOperatorTable.CAST.createCall(pos,
-            new SqlDataTypeSpec(
-                new SqlIdentifier(avgType.getSqlTypeName().getName(), pos),
-                avgType.getPrecision(), avgType.getScale(), null, null, pos));
-      } else {
-        sumCast = sum;
-      }
+      sumCast = getCastedSqlNode(sum, avgType, pos, sumRex);
       final SqlNode count =
           SqlStdOperatorTable.COUNT.createCall(pos, arg);
       return SqlStdOperatorTable.DIVIDE.createCall(
           pos, sumCast, count);
+    }
+
+    private SqlNode getCastedSqlNode(SqlNode argInput, RelDataType varType,
+                                     SqlParserPos pos, RexNode argRex) {
+      SqlNode arg;
+      if (argRex != null && !argRex.getType().equals(varType)) {
+        arg = SqlStdOperatorTable.CAST.createCall(
+                pos, argInput, SqlTypeUtil.convertTypeToSpec(varType));
+      } else {
+        arg = argInput;
+      }
+      return arg;
     }
 
     private SqlNode expandVariance(
