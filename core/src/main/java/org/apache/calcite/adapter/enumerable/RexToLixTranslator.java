@@ -16,8 +16,6 @@
  */
 package org.apache.calcite.adapter.enumerable;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import org.apache.calcite.DataContext;
 import org.apache.calcite.adapter.java.JavaTypeFactory;
 import org.apache.calcite.avatica.util.ByteString;
@@ -55,9 +53,10 @@ import org.apache.calcite.util.ControlFlowException;
 import org.apache.calcite.util.Pair;
 import org.apache.calcite.util.Util;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -67,6 +66,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 import static org.apache.calcite.sql.fun.OracleSqlOperatorTable.TRANSLATE3;
 import static org.apache.calcite.sql.fun.SqlStdOperatorTable.CHARACTER_LENGTH;
@@ -1265,12 +1265,12 @@ public class RexToLixTranslator {
     return translateToInit(list.getParameterExpressionMap(), expr);
   }
 
-  /**
-   * get the initial expression of parameter expression started with 'v'
-   * */
-  private Expression translateToInit(final Map<ParameterExpression, Expression> paramExprMap, Expression expr) {
+  /** get the initial expression of parameter expression started with 'v' */
+  private Expression translateToInit(final Map<ParameterExpression, Expression> paramExprMap,
+                                     Expression expr) {
     Expression result = expr;
-    if (expr instanceof ParameterExpression && expr.toString().startsWith("v") && paramExprMap.containsKey(expr)) {
+    if (expr instanceof ParameterExpression && expr.toString().startsWith("v")
+            && paramExprMap.containsKey(expr)) {
       result = translateToInit(paramExprMap, paramExprMap.get(expr));
     } else if (expr instanceof BinaryExpression) {
       BinaryExpression biExpr = (BinaryExpression) expr;
@@ -1278,13 +1278,14 @@ public class RexToLixTranslator {
       Expression expr1 = translateToInit(paramExprMap, biExpr.expression1);
       result = Expressions.makeBinary(biExpr.nodeType, expr0, expr1);
     } else if (expr instanceof MethodCallExpression) {
-      List<Expression> innerExprs = Lists.transform(((MethodCallExpression) expr).expressions, new Function<Expression, Expression>() {
-        @Nullable
-        @Override
-        public Expression apply(@Nullable Expression input) {
-          return translateToInit(paramExprMap, input);
+      List<Expression> innerExprs = Lists.transform(((MethodCallExpression) expr).expressions,
+            new Function<Expression, Expression>() {
+          @Nullable
+          @Override public Expression apply(@Nullable Expression input) {
+            return translateToInit(paramExprMap, input);
+          }
         }
-      });
+      );
       result = Expressions.call(((MethodCallExpression) expr).method, innerExprs);
     }
     return result;

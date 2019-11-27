@@ -2113,7 +2113,8 @@ public class RexImpTable {
         // : Expressions.condition(test, ifTrue, ifFalse);
         // the expression behind then should not be isolated with its condition,
         // otherwise exceptions may happen, like Division Undefined
-            : Expressions.condition(test, translator.translateToInit(ifTrue), translator.translateToInit(ifFalse));
+            : Expressions.condition(test, translator.translateToInit(ifTrue),
+                translator.translateToInit(ifFalse));
       }
     }
   }
