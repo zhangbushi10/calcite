@@ -62,6 +62,7 @@ import org.apache.calcite.rex.LogicVisitor;
 import org.apache.calcite.rex.RexBuilder;
 import org.apache.calcite.rex.RexCall;
 import org.apache.calcite.rex.RexCorrelVariable;
+import org.apache.calcite.rex.RexDynamicParam;
 import org.apache.calcite.rex.RexExecutor;
 import org.apache.calcite.rex.RexExecutorImpl;
 import org.apache.calcite.rex.RexFieldAccess;
@@ -3456,6 +3457,61 @@ public abstract class RelOptUtil {
     // and ask whether first implies second.
     // It does, so we have no nullable columns.
     return !checker.implies(first, second);
+  }
+
+  // OVERRIDE POINT
+  public static boolean containCast(RexNode node) {
+    switch (node.getKind()) {
+    case IS_NULL:
+    case IS_NOT_NULL:
+    case OR:
+    case AND:
+    case EQUALS:
+      final RexCall call = (RexCall) node;
+      for (RexNode operand : call.getOperands()) {
+        if (containCast(operand)) {
+          return true;
+        }
+      }
+      break;
+    case CAST:
+      return true;
+    default:
+      return false;
+    }
+    return false;
+  }
+
+  // OVERRIDE POINT
+  public static RexNode convertCastCondition(RexNode node) {
+    switch (node.getKind()) {
+    case IS_NULL:
+    case IS_NOT_NULL:
+    case OR:
+    case AND:
+    case EQUALS:
+      RexCall call = (RexCall) node;
+      List<RexNode> list = Lists.newArrayList();
+      List<RexNode> operands = Lists.newArrayList(call.getOperands());
+      for (int i = 0; i < operands.size(); i++) {
+        RexNode operand = operands.get(i);
+        final RexNode e = convertCastCondition(operand);
+        list.add(e);
+      }
+      if (!list.equals(call.getOperands())) {
+        return call.clone(call.getType(), list);
+      }
+      return call;
+    case CAST:
+      call = (RexCall) node;
+      RexNode expr = call.getOperands().get(0);
+      if (expr instanceof RexLiteral || expr instanceof RexDynamicParam) {
+        return call;
+      }
+      return expr;
+    default:
+      return node;
+    }
   }
 
   //~ Inner Classes ----------------------------------------------------------

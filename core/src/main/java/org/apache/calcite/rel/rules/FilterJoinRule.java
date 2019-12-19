@@ -239,9 +239,20 @@ public abstract class FilterJoinRule extends RelOptRule {
         ImmutableList.<RelDataType>builder()
             .addAll(RelOptUtil.getFieldTypeList(leftRel.getRowType()))
             .addAll(RelOptUtil.getFieldTypeList(rightRel.getRowType())).build();
+
+    final List<RexNode> joinFilters2 = new ArrayList<>();
+
+    for (RexNode rexNode : joinFilters) {
+      if (RelOptUtil.containCast(rexNode)) {
+        joinFilters2.add(RelOptUtil.convertCastCondition(rexNode));
+      } else {
+        joinFilters2.add(rexNode);
+      }
+    }
+
     final RexNode joinFilter =
         RexUtil.composeConjunction(rexBuilder,
-            RexUtil.fixUp(rexBuilder, joinFilters, fieldTypes),
+            RexUtil.fixUp(rexBuilder, joinFilters2, fieldTypes),
             false);
 
     // If nothing actually got pushed and there is nothing leftover,
