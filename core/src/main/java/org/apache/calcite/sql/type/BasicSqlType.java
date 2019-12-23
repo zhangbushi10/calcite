@@ -183,7 +183,7 @@ public class BasicSqlType extends AbstractSqlType {
           && typeSystem.getDefaultPrecision(typeName) > -1) {
         printPrecision = true;
       }
-      if (typeName.getDefaultScale() > -1) {
+      if (typeSystem.getDefaultScale(typeName) > -1) {
         printScale = true;
       }
     }

@@ -3503,7 +3503,7 @@ public class SqlValidatorTest extends SqlValidatorTestCase {
       assertThat(typeSystem.getDefaultPrecision(typeName), is(2));
       assertThat(typeName.getMinScale(), is(1));
       assertThat(typeSystem.getMaxScale(typeName), is(9));
-      assertThat(typeName.getDefaultScale(), is(6));
+      assertThat(typeSystem.getDefaultScale(typeName), is(6));
     }
 
     // Tests that should pass both parser and validator
