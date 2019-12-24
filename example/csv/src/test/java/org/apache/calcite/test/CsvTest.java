@@ -179,6 +179,10 @@ public class CsvTest {
     sql("model", "select * from EMPS").ok();
   }
 
+  @Test public void testSelect1() throws SQLException {
+    sql("model", "select if(name <> '', null, 123) from EMPS").ok();
+  }
+
   @Test public void testSelectSingleProjectGz() throws SQLException {
     sql("smart", "select name from EMPS").ok();
   }

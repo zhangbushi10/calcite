@@ -453,6 +453,10 @@ public class RexImpTable {
     };
   }
 
+  public void defineImplementor(SqlOperator operator, CallImplementor implementor) {
+    map.put(operator, implementor);
+  }
+
   private void defineImplementor(
       SqlOperator operator,
       NullPolicy nullPolicy,
