@@ -872,8 +872,9 @@ public class CalcitePrepareImpl implements CalcitePrepare {
         ChainedSqlOperatorTable.of(opTab0, catalogReader);
     final JavaTypeFactory typeFactory = context.getTypeFactory();
     final SqlConformance conformance = context.config().conformance();
-    return new CalciteSqlValidator(opTab, catalogReader, typeFactory,
+    SqlValidator validator =  new CalciteSqlValidator(opTab, catalogReader, typeFactory,
         conformance);
+    return  context.config().getCustomerValidation(SqlValidator.class, validator);
   }
 
   private List<ColumnMetaData> getColumnMetaDataList(

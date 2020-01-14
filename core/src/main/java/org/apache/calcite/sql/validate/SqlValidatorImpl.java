@@ -463,7 +463,7 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
     return false;
   }
 
-  private boolean expandStar(List<SqlNode> selectItems, Set<String> aliases,
+  protected boolean expandStar(List<SqlNode> selectItems, Set<String> aliases,
       List<Map.Entry<String, RelDataType>> types, boolean includeSystemVars,
       SelectScope scope, SqlNode node) {
     if (!(node instanceof SqlIdentifier)) {
@@ -509,7 +509,7 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
                     startPosition);
             // Don't add expanded rolled up columns
             // HACK POINT: exclude ComputedColumns
-            if (!isRolledUpColumn(exp, scope) && !columnName.startsWith("_CC_")) {
+            if (needAddOrExpandField(exp, scope, field)) {
               addOrExpandField(
                       selectItems,
                       aliases,
@@ -579,7 +579,13 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
     }
   }
 
-  private boolean addOrExpandField(List<SqlNode> selectItems, Set<String> aliases,
+  protected boolean needAddOrExpandField(SqlIdentifier exp,
+                                         SelectScope scope,
+                                         RelDataTypeField field) {
+    return !isRolledUpColumn(exp, scope);
+  }
+
+  protected boolean addOrExpandField(List<SqlNode> selectItems, Set<String> aliases,
       List<Map.Entry<String, RelDataType>> types, boolean includeSystemVars,
       SelectScope scope, SqlIdentifier id, RelDataTypeField field) {
     switch (field.getType().getStructKind()) {
@@ -1006,7 +1012,7 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
     return scopes.get(node);
   }
 
-  private SqlValidatorNamespace getNamespace(SqlNode node,
+  protected SqlValidatorNamespace getNamespace(SqlNode node,
       SqlValidatorScope scope) {
     if (node instanceof SqlIdentifier && scope instanceof DelegatingScope) {
       final SqlIdentifier id = (SqlIdentifier) node;
@@ -3387,7 +3393,7 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
 
 
   // Returns true iff the given column is actually rolled up.
-  private boolean isRolledUpColumn(SqlIdentifier identifier, SqlValidatorScope scope) {
+  protected boolean isRolledUpColumn(SqlIdentifier identifier, SqlValidatorScope scope) {
     Pair<String, String> pair = findTableColumnPair(identifier, scope);
 
     if (pair == null) {

@@ -28,7 +28,9 @@ import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.util.ChainedSqlOperatorTable;
 import org.apache.calcite.sql.validate.SqlConformance;
 import org.apache.calcite.sql.validate.SqlConformanceEnum;
+import org.apache.calcite.sql.validate.SqlValidatorImpl;
 
+import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Properties;
@@ -96,6 +98,21 @@ public class CalciteConnectionConfigImpl extends ConnectionConfigImpl
     return operatorTableClass.cast(
         ChainedSqlOperatorTable.of(
             tables.toArray(new SqlOperatorTable[tables.size()])));
+  }
+
+  public <T> T getCustomerValidation(Class<T> validationClass, T defaultValidation) {
+    final String validationClazz =
+            CalciteConnectionProperty.CUSTOMER_VALIDATOR.wrap(properties).getString();
+    if (validationClazz == null || validationClazz.equals("")) {
+      return defaultValidation;
+    }
+    try {
+      Constructor constructors = Class.forName(validationClazz)
+                .getConstructor(SqlValidatorImpl.class);
+      return (T) constructors.newInstance(defaultValidation);
+    } catch (Exception e) {
+      return defaultValidation;
+    }
   }
 
   private static void operatorTable(String s,
