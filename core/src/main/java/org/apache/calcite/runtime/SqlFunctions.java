@@ -1543,7 +1543,7 @@ public class SqlFunctions {
       return "0E0";
     }
     BigDecimal bigDecimal =
-        new BigDecimal(String.valueOf(x), MathContext.DECIMAL32).stripTrailingZeros();
+        new BigDecimal(String.valueOf(x), MathContext.DECIMAL32);
     final String s = bigDecimal.toString();
     return s.replaceAll("0*E", "E").replace("E+", "E");
   }
@@ -1554,7 +1554,7 @@ public class SqlFunctions {
       return "0E0";
     }
     BigDecimal bigDecimal =
-        new BigDecimal(String.valueOf(x), MathContext.DECIMAL64).stripTrailingZeros();
+        new BigDecimal(String.valueOf(x), MathContext.DECIMAL64);
     final String s = bigDecimal.toString();
     return s.replaceAll("0*E", "E").replace("E+", "E");
   }
