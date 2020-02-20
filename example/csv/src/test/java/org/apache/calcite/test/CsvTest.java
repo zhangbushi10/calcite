@@ -176,7 +176,7 @@ public class CsvTest {
    * Reads from a table.
    */
   @Test public void testSelect() throws SQLException {
-    sql("model", "select * from EMPS").ok();
+    sql("model", "select week('2012-01-01') from EMPS").ok();
   }
 
   @Test public void testSelect1() throws SQLException {

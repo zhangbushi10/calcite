@@ -27,7 +27,7 @@ limitations under the License.
   <groupId>org.apache.calcite</groupId>
   <artifactId>calcite</artifactId>
   <packaging>pom</packaging>
-<version>1.16.0-kylin-4.x-r24</version>
+<version>1.16.0-kylin-4.x-r25</version>
 
   <!-- More project information. -->
   <name>Calcite</name>
@@ -1135,12 +1135,12 @@ limitations under the License.
     <snapshotRepository>
       <id>user-snapshots</id>
       <name>User Project SNAPSHOTS</name>
-      <url>http://repository.kyligence.io:8081/repository/maven-snapshots/</url>
+      <url>https://repository.kyligence.io/repository/maven-snapshots/</url>
     </snapshotRepository>
     <repository>
       <id>user-releases</id>
       <name>User Project Release</name>
-      <url>http://repository.kyligence.io:8081/repository/maven-releases/</url>
+      <url>https://repository.kyligence.io/repository/maven-releases/</url>
     </repository>
   </distributionManagement>
 
