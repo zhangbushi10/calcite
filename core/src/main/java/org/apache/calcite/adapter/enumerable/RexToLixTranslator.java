@@ -991,7 +991,7 @@ public class RexToLixTranslator {
 
       // E.g. from "Decimal" to "Double"
       // Generate "x == null ? (Double) null : Double.valueOf(x.doubleValue())"
-      if (fromNumber) {
+      if (fromNumber && fromBox != toPrimitive) {
         return Expressions.condition(
                 Expressions.equal(operand, RexImpTable.NULL_EXPR),
                 RexImpTable.NULL_EXPR,
@@ -1000,7 +1000,7 @@ public class RexToLixTranslator {
                         toPrimitive));
       }
 
-      if (fromBox == Primitive.CHAR) {
+      if (fromNumber || fromBox == Primitive.CHAR) {
         // Generate "x.shortValue()".
         return Expressions.unbox(operand, toPrimitive);
       } else {
