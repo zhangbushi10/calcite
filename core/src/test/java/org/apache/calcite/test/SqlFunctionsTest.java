@@ -159,7 +159,7 @@ public class SqlFunctionsTest {
     checkAddMonths(2016, 1, 1, 2015, 1, 1, -12);
     checkAddMonths(2016, 1, 1, 2018, 10, 1, 33);
     checkAddMonths(2016, 1, 31, 2016, 4, 30, 3);
-    checkAddMonths(2016, 4, 30, 2016, 7, 30, 3);
+    checkAddMonths(2016, 4, 30, 2016, 7, 31, 3);
     checkAddMonths(2016, 1, 31, 2016, 2, 29, 1);
     checkAddMonths(2016, 3, 31, 2016, 2, 29, -1);
     checkAddMonths(2016, 3, 31, 2116, 3, 31, 1200);

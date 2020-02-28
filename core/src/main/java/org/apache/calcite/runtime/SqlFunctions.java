@@ -2333,16 +2333,16 @@ public class SqlFunctions {
     int y0 = (int) DateTimeUtils.unixDateExtract(TimeUnitRange.YEAR, date);
     int m0 = (int) DateTimeUtils.unixDateExtract(TimeUnitRange.MONTH, date);
     int d0 = (int) DateTimeUtils.unixDateExtract(TimeUnitRange.DAY, date);
+    int endOfMonth = lastDay(y0, m0);
     int y = (m + m0) / 12;
     y0 += y;
     m0 = m + m0 - y * 12;
     if (m0 <= 0) {
       m0 += 12;
-      assert m0 > 0;
-      y0--;
+      y0 -= 1;
     }
     int last = lastDay(y0, m0);
-    if (d0 > last) {
+    if (d0 == endOfMonth || d0 > last) {
       d0 = last;
     }
     return DateTimeUtils.ymdToUnixDate(y0, m0, d0);
