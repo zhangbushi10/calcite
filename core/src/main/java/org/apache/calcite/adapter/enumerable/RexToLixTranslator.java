@@ -981,25 +981,12 @@ public class RexToLixTranslator {
         }
       }
     }
-
     if (toPrimitive != null) {
       if (fromPrimitive != null) {
         // E.g. from "float" to "double"
         return Expressions.convert_(
             operand, toPrimitive.primitiveClass);
       }
-
-      // E.g. from "Decimal" to "Double"
-      // Generate "x == null ? (Double) null : Double.valueOf(x.doubleValue())"
-      if (fromNumber && fromBox != toPrimitive) {
-        return Expressions.condition(
-                Expressions.equal(operand, RexImpTable.NULL_EXPR),
-                RexImpTable.NULL_EXPR,
-                Expressions.box(
-                        Expressions.unbox(operand, toPrimitive),
-                        toPrimitive));
-      }
-
       if (fromNumber || fromBox == Primitive.CHAR) {
         // Generate "x.shortValue()".
         return Expressions.unbox(operand, toPrimitive);
