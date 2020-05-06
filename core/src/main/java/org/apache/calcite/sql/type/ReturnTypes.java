@@ -410,6 +410,48 @@ public abstract class ReturnTypes {
           return null;
         }
       };
+
+  /**
+   * Type-inference strategy for a call where the first argument is a decimal.
+   * The second argument is a int.
+   * The result type of a call is a decimal with a scale of second argument, and the same
+   * precision and nullability as the first argument.
+   */
+  public static final SqlReturnTypeInference DECIMAL_SCALE_N =
+      new SqlReturnTypeInference() {
+        public RelDataType inferReturnType(
+                SqlOperatorBinding opBinding) {
+          RelDataType type1 = opBinding.getOperandType(0);
+          RelDataType type2 = opBinding.getOperandType(1);
+
+          if (SqlTypeUtil.isDecimal(type1) && SqlTypeUtil.isIntType(type2)) {
+            int p = type1.getPrecision();
+            int s = opBinding.getOperandLiteralValue(1, Integer.class);
+
+            RelDataType ret;
+            ret =
+                    opBinding.getTypeFactory().createSqlType(
+                            SqlTypeName.DECIMAL,
+                            p,
+                            s);
+            if (type1.isNullable()) {
+              ret =
+                      opBinding.getTypeFactory()
+                              .createTypeWithNullability(ret, true);
+            }
+            return ret;
+          }
+          return null;
+        }
+      };
+
+  /**
+   * Type-inference strategy whereby the result type of a call is
+   * {@link #DECIMAL_SCALE_N} with a fallback to {@link #ARG0_NULLABLE}
+   */
+  public static final SqlReturnTypeInference SCALE_N_OR_ARG0_NULLABLE =
+      chain(DECIMAL_SCALE_N, ARG0_NULLABLE);
+
   /**
    * Type-inference strategy whereby the result type of a call is
    * {@link #DECIMAL_SCALE0} with a fallback to {@link #ARG0} This rule
