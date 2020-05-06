@@ -410,13 +410,34 @@ public abstract class ReturnTypes {
           return null;
         }
       };
+
+  /**
+   * return long type for all numeric type
+   */
+  public static final SqlReturnTypeInference NUMERIC_TO_LONG =
+      new SqlReturnTypeInference() {
+        public RelDataType inferReturnType(
+            SqlOperatorBinding opBinding) {
+          RelDataType type1 = opBinding.getOperandType(0);
+          if (SqlTypeUtil.isNumeric(type1)) {
+            RelDataType ret;
+            ret = opBinding.getTypeFactory().createSqlType(SqlTypeName.BIGINT);
+            if (type1.isNullable()) {
+              ret = opBinding.getTypeFactory()
+                              .createTypeWithNullability(ret, true);
+            }
+            return ret;
+          }
+          return null;
+        }
+      };
   /**
    * Type-inference strategy whereby the result type of a call is
    * {@link #DECIMAL_SCALE0} with a fallback to {@link #ARG0} This rule
    * is used for floor, ceiling.
    */
   public static final SqlReturnTypeInference ARG0_OR_EXACT_NO_SCALE =
-      chain(DECIMAL_SCALE0, ARG0);
+      chain(DECIMAL_SCALE0, NUMERIC_TO_LONG, ARG0);
 
   /**
    * Type-inference strategy whereby the result type of a call is the decimal
