@@ -422,11 +422,19 @@ public abstract class ReturnTypes {
         public RelDataType inferReturnType(
                 SqlOperatorBinding opBinding) {
           RelDataType type1 = opBinding.getOperandType(0);
-          RelDataType type2 = opBinding.getOperandType(1);
 
-          if (SqlTypeUtil.isDecimal(type1) && SqlTypeUtil.isIntType(type2)) {
+          if (SqlTypeUtil.isDecimal(type1)) {
             int p = type1.getPrecision();
-            int s = opBinding.getOperandLiteralValue(1, Integer.class);
+            int s = 0;
+
+            if (opBinding.getOperandCount() == 2) {
+              RelDataType type2 = opBinding.getOperandType(1);
+              if (SqlTypeUtil.isIntType(type2)) {
+                s = opBinding.getOperandLiteralValue(1, Integer.class);
+              } else {
+                return null;
+              }
+            }
 
             RelDataType ret;
             ret =
@@ -441,6 +449,7 @@ public abstract class ReturnTypes {
             }
             return ret;
           }
+
           return null;
         }
       };
