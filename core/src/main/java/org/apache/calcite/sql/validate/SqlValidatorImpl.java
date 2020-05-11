@@ -508,8 +508,9 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
                     ImmutableList.of(child.name, columnName),
                     startPosition);
             // Don't add expanded rolled up columns
-            // HACK POINT: exclude ComputedColumns
-            if (!isRolledUpColumn(exp, scope) && !columnName.startsWith("_CC_")) {
+            // HACK POINT: exclude ComputedColumns and _KY_ columns
+            if (!isRolledUpColumn(exp, scope) && !columnName.startsWith("_CC_")
+                    && !columnName.startsWith("_KY_")) {
               addOrExpandField(
                       selectItems,
                       aliases,
