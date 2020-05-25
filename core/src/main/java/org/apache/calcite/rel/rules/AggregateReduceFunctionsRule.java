@@ -127,7 +127,7 @@ public class AggregateReduceFunctionsRule extends RelOptRule {
   /**
    * Returns whether the aggregate call is a reducible function
    */
-  private boolean isReducible(final SqlKind kind) {
+  protected boolean isReducible(final SqlKind kind) {
     if (SqlKind.AVG_AGG_FUNCTIONS.contains(kind)) {
       return true;
     }
