@@ -178,6 +178,8 @@ public class CalcitePrepareImpl implements CalcitePrepare {
 
   public static final ThreadLocal<Boolean> DIVIDE_FORCE_RETURN_DOUBLE = new ThreadLocal<>();
 
+  public static final ThreadLocal<Boolean> CONVERT_INNER_TO_LEFT_JOIN = new ThreadLocal<>();
+
   public static final boolean COMMUTE =
       Util.getBooleanProperty("calcite.enable.join.commute");
 

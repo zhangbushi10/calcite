@@ -68,6 +68,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static org.apache.calcite.prepare.CalcitePrepareImpl.CONVERT_INNER_TO_LEFT_JOIN;
 import static org.apache.calcite.util.Static.RESOURCE;
 
 /**
@@ -485,6 +486,10 @@ public class SqlValidatorUtil {
     assert systemFieldList != null;
     switch (joinType) {
     case LEFT:
+      if (CONVERT_INNER_TO_LEFT_JOIN.get() != null && CONVERT_INNER_TO_LEFT_JOIN.get()) {
+        // for KE-13889, convert inner join to left join, do not change 'rightType'
+        break;
+      }
       rightType = typeFactory.createTypeWithNullability(rightType, true);
       break;
     case RIGHT:
