@@ -365,6 +365,11 @@ public class HepPlanner extends AbstractRelOptPlanner {
       boolean forceConversions, int nMatches) {
     while (iter.hasNext()) {
       HepRelVertex vertex = iter.next();
+      if (vertex != root && Graphs.predecessorListOf(graph, vertex).isEmpty()) {
+        // KE-14109: after some rules applied, this vertex may be changed to garbage,
+        // and it is not need to apply rules
+        continue;
+      }
       for (RelOptRule rule : rules) {
         HepRelVertex newVertex =
             applyRule(rule, vertex, forceConversions);
