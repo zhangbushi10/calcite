@@ -55,6 +55,8 @@ import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 
+import static java.math.BigDecimal.ROUND_HALF_UP;
+
 /*
  * OVERRIDE POINT:
  * - more power() overloads
@@ -1774,6 +1776,11 @@ public class SqlFunctions {
     return new BigDecimal(s.trim());
   }
 
+  public static BigDecimal toBigDecimal(String s, int precision, int scale) {
+    BigDecimal bigDecimal =  new BigDecimal(s.trim());
+    return bigDecimal.setScale(scale, ROUND_HALF_UP);
+  }
+
   public static BigDecimal toBigDecimal(Number number) {
     // There are some values of "long" that cannot be represented as "double".
     // Not so "int". If it isn't a long, go straight to double.
@@ -1783,9 +1790,25 @@ public class SqlFunctions {
         : new BigDecimal(number.doubleValue());
   }
 
+  public static BigDecimal toBigDecimal(Number number, int precision, int scale) {
+    // There are some values of "long" that cannot be represented as "double".
+    // Not so "int". If it isn't a long, go straight to double.
+    BigDecimal bigDecimal = number instanceof BigDecimal ? (BigDecimal) number
+            : number instanceof BigInteger ? new BigDecimal((BigInteger) number)
+            : number instanceof Long ? new BigDecimal(number.longValue())
+            : new BigDecimal(number.doubleValue());
+
+    return bigDecimal.setScale(scale, ROUND_HALF_UP);
+  }
+
   public static BigDecimal toBigDecimal(Object o) {
     return o instanceof Number ? toBigDecimal((Number) o)
         : toBigDecimal(o.toString());
+  }
+
+  public static BigDecimal toBigDecimal(Object o, int precision, int scale) {
+    return o instanceof Number ? toBigDecimal((Number) o, precision, scale)
+            : toBigDecimal(o.toString(), precision, scale);
   }
 
   /** Converts the internal representation of a SQL DATE (int) to the Java
