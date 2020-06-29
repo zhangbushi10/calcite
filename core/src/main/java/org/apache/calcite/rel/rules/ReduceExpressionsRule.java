@@ -334,6 +334,9 @@ public abstract class ReduceExpressionsRule extends RelOptRule {
           ImmutableList<RexNode> rexNodesOperands = ((RexCall) rexNode).operands;
           RexNode left = rexNodesOperands.get(0);
           RexNode right = rexNodesOperands.get(1);
+          if (left instanceof RexLiteral && right instanceof RexLiteral) {
+            return false;
+          }
           if (left instanceof RexInputRef && right instanceof RexInputRef) {
             columnToColumns.add(new Pair(left, right));
           } else if ((left instanceof RexInputRef && right instanceof RexLiteral)
