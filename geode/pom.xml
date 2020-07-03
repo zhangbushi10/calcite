@@ -20,12 +20,20 @@ limitations under the License.
   <parent>
     <groupId>org.apache.calcite</groupId>
     <artifactId>calcite</artifactId>
-    <version>1.16.0-kylin-3.x-r33</version>
+<<<<<<< HEAD
+    <version>1.16.0-kylin-3.x-r34</version>
+=======
+    <version>1.16.0-kylin-3.x-r31</version>
+>>>>>>> parent of 4ad46c930... KE-14015 Fix cast decimal to decimal get wrong precision result (#149)
   </parent>
 
   <artifactId>calcite-geode</artifactId>
   <packaging>jar</packaging>
-  <version>1.16.0-kylin-3.x-r33</version>
+<<<<<<< HEAD
+  <version>1.16.0-kylin-3.x-r34</version>
+=======
+  <version>1.16.0-kylin-3.x-r31</version>
+>>>>>>> parent of 4ad46c930... KE-14015 Fix cast decimal to decimal get wrong precision result (#149)
   <name>Calcite Geode</name>
   <description>Geode adapter for Calcite</description>
 

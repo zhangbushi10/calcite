@@ -68,7 +68,6 @@ import static org.apache.calcite.sql.fun.SqlStdOperatorTable.CHARACTER_LENGTH;
 import static org.apache.calcite.sql.fun.SqlStdOperatorTable.CHAR_LENGTH;
 import static org.apache.calcite.sql.fun.SqlStdOperatorTable.SUBSTRING;
 import static org.apache.calcite.sql.fun.SqlStdOperatorTable.UPPER;
-import static org.apache.calcite.sql.type.SqlTypeName.DECIMAL;
 
 /**
  * Translates {@link org.apache.calcite.rex.RexNode REX expressions} to
@@ -225,7 +224,6 @@ public class RexToLixTranslator {
     return list.append("v", expression);
   }
 
-  @SuppressWarnings("checkstyle:methodlength")
   Expression translateCast(
       RelDataType sourceType,
       RelDataType targetType,
@@ -234,18 +232,6 @@ public class RexToLixTranslator {
     switch (targetType.getSqlTypeName()) {
     case ANY:
       convert = operand;
-      break;
-    case DECIMAL:
-      if (sourceType.getSqlTypeName() == DECIMAL
-              && (sourceType.getPrecision() != targetType.getPrecision()
-              || sourceType.getScale() != targetType.getScale())) {
-        convert = Expressions.call(
-                SqlFunctions.class,
-                "toBigDecimal",
-                operand,
-                new ConstantExpression(Integer.TYPE, targetType.getPrecision()),
-                new ConstantExpression(Integer.TYPE, targetType.getScale()));
-      }
       break;
     case DATE:
       switch (sourceType.getSqlTypeName()) {
