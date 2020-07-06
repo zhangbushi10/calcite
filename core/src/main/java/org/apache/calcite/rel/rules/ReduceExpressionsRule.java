@@ -972,7 +972,8 @@ public abstract class ReduceExpressionsRule extends RelOptRule {
 
       // Even if all operands are constant, the call itself may
       // be non-deterministic.
-      if (!call.getOperator().isDeterministic() || call.getOperator().getKind() == SqlKind.IN) {
+      if (!call.getOperator().isDeterministic() || call.getOperator().getKind() == SqlKind.IN
+              || call.getOperator().getKind() == SqlKind.NOT_IN) {
         callConstancy = Constancy.NON_CONSTANT;
       } else if (call.getOperator().isDynamicFunction()) {
         // We can reduce the call to a constant, but we can't
