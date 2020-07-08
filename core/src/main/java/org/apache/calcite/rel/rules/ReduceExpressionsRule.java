@@ -59,6 +59,7 @@ import org.apache.calcite.sql.SqlKind;
 import org.apache.calcite.sql.SqlOperator;
 import org.apache.calcite.sql.fun.SqlRowOperator;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
+import org.apache.calcite.sql.type.SqlTypeFamily;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.tools.RelBuilder;
 import org.apache.calcite.tools.RelBuilderFactory;
@@ -327,6 +328,10 @@ public abstract class ReduceExpressionsRule extends RelOptRule {
       List<Pair<RexInputRef, RexInputRef>> columnToColumns = Lists.newArrayList();
       Map<RexInputRef, Set<RexLiteral>> columnToConstants = Maps.newHashMap();
       for (RexNode rexNode: operands) {
+        if (rexNode instanceof RexLiteral
+                && SqlTypeFamily.BOOLEAN == rexNode.getType().getFamily()) {
+          return false;
+        }
         if (!(rexNode instanceof RexCall)) {
           continue;
         }
