@@ -492,6 +492,20 @@ public abstract class ReturnTypes {
           return typeFactory.createDecimalQuotient(type1, type2);
         }
       };
+
+  /**
+   * Type-inference strategy for division of integers
+   */
+  public static final SqlReturnTypeInference DOUBLE_QUOTIENT =
+      new SqlReturnTypeInference() {
+        public RelDataType inferReturnType(
+                SqlOperatorBinding opBinding) {
+          RelDataTypeFactory typeFactory = opBinding.getTypeFactory();
+          RelDataType type1 = opBinding.getOperandType(0);
+          RelDataType type2 = opBinding.getOperandType(1);
+          return typeFactory.createDoubleQuotient(type1, type2);
+        }
+      };
   /**
    * Same as {@link #DECIMAL_QUOTIENT} but returns with nullability if any of
    * the operands is nullable by using
@@ -501,6 +515,14 @@ public abstract class ReturnTypes {
       cascade(DECIMAL_QUOTIENT, SqlTypeTransforms.TO_NULLABLE);
 
   /**
+   * Same as {@link #DOUBLE_QUOTIENT} but returns with nullability if any of
+   * the operands is nullable by using
+   * {@link org.apache.calcite.sql.type.SqlTypeTransforms#TO_NULLABLE}
+   */
+  public static final SqlReturnTypeInference DOUBLE_QUOTIENT_NULLABLE =
+          cascade(DOUBLE_QUOTIENT, SqlTypeTransforms.TO_NULLABLE);
+
+  /**
    * Type-inference strategy whereby the result type of a call is
    * {@link #DECIMAL_QUOTIENT_NULLABLE} with a fallback to
    * {@link #ARG0_INTERVAL_NULLABLE} and {@link #LEAST_RESTRICTIVE} These rules
@@ -508,7 +530,10 @@ public abstract class ReturnTypes {
    */
   public static final SqlReturnTypeInference QUOTIENT_NULLABLE =
       chain(
-          DECIMAL_QUOTIENT_NULLABLE, ARG0_INTERVAL_NULLABLE, LEAST_RESTRICTIVE);
+          DOUBLE_QUOTIENT_NULLABLE,
+          DECIMAL_QUOTIENT_NULLABLE,
+          ARG0_INTERVAL_NULLABLE,
+          LEAST_RESTRICTIVE);
   /**
    * Type-inference strategy whereby the result type of a call is the decimal
    * sum of two exact numeric operands where at least one of the operands is a

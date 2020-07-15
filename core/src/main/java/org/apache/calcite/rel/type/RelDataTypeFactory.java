@@ -300,6 +300,10 @@ public interface RelDataTypeFactory {
       RelDataType type1,
       RelDataType type2);
 
+  RelDataType createDoubleQuotient(
+          RelDataType type1,
+          RelDataType type2);
+
   /**
    * Creates a
    * {@link org.apache.calcite.rel.type.RelDataTypeFactory.FieldInfoBuilder}.
