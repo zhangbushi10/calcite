@@ -421,33 +421,37 @@ public abstract class ReturnTypes {
       new SqlReturnTypeInference() {
         public RelDataType inferReturnType(
                 SqlOperatorBinding opBinding) {
-          RelDataType type1 = opBinding.getOperandType(0);
+          try {
+            RelDataType type1 = opBinding.getOperandType(0);
 
-          if (SqlTypeUtil.isDecimal(type1)) {
-            int p = type1.getPrecision();
-            int s = 0;
+            if (SqlTypeUtil.isDecimal(type1)) {
+              int p = type1.getPrecision();
+              int s = 0;
 
-            if (opBinding.getOperandCount() == 2) {
-              RelDataType type2 = opBinding.getOperandType(1);
-              if (SqlTypeUtil.isIntType(type2)) {
-                s = opBinding.getOperandLiteralValue(1, Integer.class);
-              } else {
-                return null;
+              if (opBinding.getOperandCount() == 2) {
+                RelDataType type2 = opBinding.getOperandType(1);
+                if (SqlTypeUtil.isIntType(type2)) {
+                  s = opBinding.getOperandLiteralValue(1, Integer.class);
+                } else {
+                  return null;
+                }
               }
-            }
 
-            RelDataType ret;
-            ret =
-                    opBinding.getTypeFactory().createSqlType(
-                            SqlTypeName.DECIMAL,
-                            p,
-                            s);
-            if (type1.isNullable()) {
+              RelDataType ret;
               ret =
-                      opBinding.getTypeFactory()
-                              .createTypeWithNullability(ret, true);
+                      opBinding.getTypeFactory().createSqlType(
+                              SqlTypeName.DECIMAL,
+                              p,
+                              s);
+              if (type1.isNullable()) {
+                ret =
+                        opBinding.getTypeFactory()
+                                .createTypeWithNullability(ret, true);
+              }
+              return ret;
             }
-            return ret;
+          } catch (Exception e) {
+            // go original path
           }
 
           return null;
