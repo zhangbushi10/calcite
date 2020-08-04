@@ -17,9 +17,12 @@
 package org.apache.calcite.sql.dialect;
 
 import org.apache.calcite.config.NullCollation;
+import org.apache.calcite.sql.SqlCall;
 import org.apache.calcite.sql.SqlDialect;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.SqlWriter;
+import org.apache.calcite.sql.fun.SqlSubstringFunction;
+import org.apache.calcite.util.RelToSqlConverterUtil;
 
 /**
  * A <code>SqlDialect</code> implementation for the Apache Hive database.
@@ -58,6 +61,32 @@ public class HiveSqlDialect extends SqlDialect {
     }
 
     return null;
+  }
+
+  @Override public void unparseCall(final SqlWriter writer, final SqlCall call,
+                                    final int leftPrec, final int rightPrec) {
+    switch (call.getKind()) {
+    case TRIM:
+      RelToSqlConverterUtil.unparseHiveTrim(writer, call, leftPrec, rightPrec);
+      break;
+    case OTHER_FUNCTION:
+      if (call.getOperator() instanceof SqlSubstringFunction) {
+        final SqlWriter.Frame funCallFrame = writer.startFunCall(call.getOperator().getName());
+        call.operand(0).unparse(writer, leftPrec, rightPrec);
+        writer.sep(",", true);
+        call.operand(1).unparse(writer, leftPrec, rightPrec);
+        if (3 == call.operandCount()) {
+          writer.sep(",", true);
+          call.operand(2).unparse(writer, leftPrec, rightPrec);
+        }
+        writer.endFunCall(funCallFrame);
+      } else {
+        super.unparseCall(writer, call, leftPrec, rightPrec);
+      }
+      break;
+    default:
+      super.unparseCall(writer, call, leftPrec, rightPrec);
+    }
   }
 }
 
