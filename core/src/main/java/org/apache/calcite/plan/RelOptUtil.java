@@ -29,6 +29,7 @@ import org.apache.calcite.rel.core.Calc;
 import org.apache.calcite.rel.core.CorrelationId;
 import org.apache.calcite.rel.core.Filter;
 import org.apache.calcite.rel.core.Join;
+import org.apache.calcite.rel.core.JoinInfo;
 import org.apache.calcite.rel.core.JoinRelType;
 import org.apache.calcite.rel.core.Project;
 import org.apache.calcite.rel.core.RelFactories;
@@ -3514,6 +3515,35 @@ public abstract class RelOptUtil {
     }
   }
 
+  public static boolean isNonEquiJoinRelRule(JoinInfo joinInfo, LogicalJoin join) {
+    RelNode left = join.getLeft();
+    RelNode right = join.getRight();
+    return isNonEquiJoinRel(joinInfo, left, right, join.getJoinType(), join.getCondition());
+  }
+
+  public static boolean isNonEquiJoinRel(JoinInfo joinInfo, RelNode left,
+                                         RelNode right, JoinRelType joinType, RexNode joinCond) {
+    if ((joinInfo.isEqui() || joinType == JoinRelType.INNER || joinCond.isAlwaysFalse())
+            && !isNotDistinctFrom(left, right, joinCond)) {
+      return false;
+    }
+    return true;
+  }
+
+  private static boolean isNotDistinctFrom(RelNode left, RelNode right, RexNode condition) {
+    final List<Integer> leftKeys = new ArrayList<>();
+    final List<Integer> rightKeys = new ArrayList<>();
+    final List<Boolean> filterNulls = new ArrayList<>();
+    RelOptUtil.splitJoinCondition(left, right, condition, leftKeys,
+            rightKeys, filterNulls);
+
+    for (int i = 0; i < leftKeys.size(); i++) {
+      if (!filterNulls.get(i)) {
+        return true;
+      }
+    }
+    return false;
+  }
   //~ Inner Classes ----------------------------------------------------------
 
   /** Visitor that finds all variables used but not stopped in an expression. */

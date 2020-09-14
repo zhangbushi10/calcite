@@ -2566,7 +2566,12 @@ public class SqlToRelConverter {
 
     // OVERRIDE POINT
     if (RelOptUtil.containCast(joinCond)) {
-      joinCond = RelOptUtil.convertCastCondition(joinCond);
+      RexNode newJoinCond = RelOptUtil.convertCastCondition(joinCond);
+      // non-equi-join need not convert cast
+      final JoinInfo info = JoinInfo.of(leftRel, rightRel, newJoinCond);
+      if (!RelOptUtil.isNonEquiJoinRel(info, leftRel, rightRel, joinType, newJoinCond)) {
+        joinCond = newJoinCond;
+      }
     }
 
     final Join originalJoin =
