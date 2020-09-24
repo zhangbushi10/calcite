@@ -72,9 +72,6 @@ public interface CalciteConnectionConfig extends ConnectionConfig {
   /* OVERRIDE POINT */
   // https://github.com/Kyligence/KAP/issues/10964
   boolean projectUnderRelRoot();
-
-  boolean skipConstantFoldingInProject();
-
   // https://github.com/Kyligence/KAP/issues/17294
   <T> T getCustomerValidation(Class<T> validationClass, T defaultValidation);
 }

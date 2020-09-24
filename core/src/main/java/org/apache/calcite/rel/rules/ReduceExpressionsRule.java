@@ -17,7 +17,6 @@
 package org.apache.calcite.rel.rules;
 
 
-import org.apache.calcite.config.CalciteConnectionConfig;
 import org.apache.calcite.plan.RelOptCluster;
 import org.apache.calcite.plan.RelOptPredicateList;
 import org.apache.calcite.plan.RelOptRule;
@@ -625,15 +624,7 @@ public abstract class ReduceExpressionsRule extends RelOptRule {
     }
 
     final List<RexNode> reducedValues = Lists.newArrayList();
-
-
-    CalciteConnectionConfig config =
-            rel.getCluster().getPlanner().getContext().unwrap(CalciteConnectionConfig.class);
-    if (config.skipConstantFoldingInProject()) {
-      reducedValues.addAll(constExps2);
-    } else {
-      executor.reduce(simplify.rexBuilder, constExps2, reducedValues);
-    }
+    executor.reduce(simplify.rexBuilder, constExps2, reducedValues);
 
     // Use RexNode.digest to judge whether each newly generated RexNode
     // is equivalent to the original one.
