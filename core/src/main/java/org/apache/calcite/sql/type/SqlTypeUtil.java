@@ -1345,6 +1345,10 @@ public abstract class SqlTypeUtil {
   public static boolean isArray(RelDataType type) {
     return type.getSqlTypeName() == SqlTypeName.ARRAY;
   }
+
+  public static boolean inStringFamily(RelDataType type) {
+    return SqlTypeFamily.STRING.getTypeNames().contains(type.getSqlTypeName());
+  }
 }
 
 // End SqlTypeUtil.java
