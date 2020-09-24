@@ -14,10 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.calcite.linq4j;
 
-public class EnumerableInterruptedException extends RuntimeException{
-    public EnumerableInterruptedException() {
-        super();
-    }
+/**
+ * throw when thread is interrupted
+ */
+public class EnumerableInterruptedException extends RuntimeException {
+
+  public EnumerableInterruptedException() {
+    super();
+  }
+
 }
+
+// End EnumerableInterruptedException.java
