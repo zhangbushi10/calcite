@@ -758,6 +758,10 @@ public class SqlFunctionsTest {
     }
   }
 
+  @Test public void testToString() {
+    assertEquals("0", SqlFunctions.toString(BigDecimal.valueOf(0)));
+    assertEquals("0.1", SqlFunctions.toString(BigDecimal.valueOf(0.1)));
+    assertEquals("-0.1", SqlFunctions.toString(BigDecimal.valueOf(-0.1)));
+  }
 }
-
 // End SqlFunctionsTest.java
