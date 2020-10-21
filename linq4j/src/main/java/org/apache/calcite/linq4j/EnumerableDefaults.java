@@ -38,6 +38,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.AbstractList;
 import java.util.AbstractMap;
@@ -1102,6 +1103,10 @@ public abstract class EnumerableDefaults {
                 : inner.toLookup(innerKeySelector, comparer);
 
         return new Enumerator<TResult>() {
+
+          Class abstractFlatListClass = getAbstractFlatListClass();
+          Method abstractFlatListHasNullValueMethod = getAbstractFlatListHasNullValueMethod();
+
           Enumerator<TSource> outers = outer.enumerator();
           Enumerator<TInner> inners = Linq4j.emptyEnumerator();
           Set<TKey> unmatchedKeys =
@@ -1146,7 +1151,7 @@ public abstract class EnumerableDefaults {
                 innerEnumerable = null;
               } else {
                 final TKey outerKey = outerKeySelector.apply(outer);
-                if (outerKey == null) {
+                if (outerKey == null || isOuterKeyHasNullValue(outerKey)) {
                   innerEnumerable = null;
                 } else {
                   if (unmatchedKeys != null) {
@@ -1168,12 +1173,47 @@ public abstract class EnumerableDefaults {
             }
           }
 
+          public boolean isOuterKeyHasNullValue(TKey outerKey) {
+            if (null != abstractFlatListClass && abstractFlatListClass.isInstance(outerKey)
+                    && null != abstractFlatListHasNullValueMethod) {
+              try {
+                return (boolean) abstractFlatListHasNullValueMethod.invoke(outerKey);
+              } catch (Exception e) {
+                return false;
+              }
+            }
+            return false;
+          }
+
           public void reset() {
             outers.reset();
           }
 
           public void close() {
             outers.close();
+          }
+
+          private Class getAbstractFlatListClass() {
+            try {
+              if (null != abstractFlatListClass) {
+                return abstractFlatListClass;
+              }
+              return Class.forName("org.apache.calcite.runtime.FlatLists$AbstractFlatList");
+            } catch (Exception e) {
+              return null;
+            }
+          }
+
+          private Method getAbstractFlatListHasNullValueMethod() {
+            try {
+              abstractFlatListClass = getAbstractFlatListClass();
+              if (null == abstractFlatListClass) {
+                return null;
+              }
+              return abstractFlatListClass.getDeclaredMethod("hasNullValue");
+            } catch (Exception e) {
+              return null;
+            }
           }
         };
       }

@@ -279,6 +279,8 @@ public class FlatLists {
     /** Returns a list that consists of a this list's elements plus a given
      * element. */
     public abstract List<T> append(T e);
+
+    public abstract boolean hasNullValue();
   }
 
   /**
@@ -384,6 +386,10 @@ public class FlatLists {
 
     public List<T> append(T e) {
       return new Flat2List<T>(t0, e);
+    }
+
+    public boolean hasNullValue() {
+      return t0 == null;
     }
   }
 
@@ -509,6 +515,10 @@ public class FlatLists {
 
     public List<T> append(T e) {
       return new Flat3List<T>(t0, t1, e);
+    }
+
+    public boolean hasNullValue() {
+      return t0 == null || t1 == null;
     }
   }
 
@@ -653,6 +663,10 @@ public class FlatLists {
 
     public List<T> append(T e) {
       return new Flat4List<T>(t0, t1, t2, e);
+    }
+
+    public boolean hasNullValue() {
+      return t0 == null || t1 == null || t2 == null;
     }
   }
 
@@ -816,6 +830,10 @@ public class FlatLists {
 
     public List<T> append(T e) {
       return new Flat5List<T>(t0, t1, t2, t3, e);
+    }
+
+    public boolean hasNullValue() {
+      return t0 == null || t1 == null || t2 == null || t3 == null;
     }
   }
 
@@ -998,6 +1016,10 @@ public class FlatLists {
 
     public List<T> append(T e) {
       return new Flat6List<T>(t0, t1, t2, t3, t4, e);
+    }
+
+    public boolean hasNullValue() {
+      return t0 == null || t1 == null || t2 == null || t3 == null || t4 == null;
     }
   }
 
@@ -1200,6 +1222,10 @@ public class FlatLists {
 
     public List<T> append(T e) {
       return ImmutableList.of(t0, t1, t2, t3, t5, e);
+    }
+
+    public boolean hasNullValue() {
+      return t0 == null || t1 == null || t2 == null || t3 == null || t4 == null || t5 == null;
     }
   }
 

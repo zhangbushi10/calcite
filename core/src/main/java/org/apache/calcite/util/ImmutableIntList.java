@@ -107,6 +107,10 @@ public class ImmutableIntList extends FlatLists.AbstractFlatList<Integer> {
     return new ImmutableIntList(ints);
   }
 
+  @Override public boolean hasNullValue() {
+    return false;
+  }
+
   @Override public int hashCode() {
     return Arrays.hashCode(ints);
   }
