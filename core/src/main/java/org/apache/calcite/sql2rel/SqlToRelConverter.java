@@ -203,6 +203,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static org.apache.calcite.prepare.CalcitePrepareImpl.CONVERT_CAST_FOR_NON_EQUI_JOIN;
+import static org.apache.calcite.prepare.CalcitePrepareImpl.REVERT_NON_EQUI_JOIN_SUPPORT;
 import static org.apache.calcite.sql.SqlUtil.stripAs;
 import static org.apache.calcite.sql.type.SqlOperandTypeChecker.Consistency.LEAST_RESTRICTIVE_NO_CONVERT_TO_VARYING;
 
@@ -2568,12 +2569,17 @@ public class SqlToRelConverter {
     // OVERRIDE POINT
     if (RelOptUtil.containCast(joinCond)) {
       RexNode newJoinCond = RelOptUtil.convertCastCondition(joinCond);
-      // non-equi-join need not convert cast
-      final JoinInfo info = JoinInfo.of(leftRel, rightRel, newJoinCond);
-      boolean isNonEquiJoin =
-              RelOptUtil.isNonEquiJoinRel(info, leftRel, rightRel, joinType, newJoinCond);
-      if (!isNonEquiJoin || (isNonEquiJoin && isConvertCastForNonEquiJoinEnabled())) {
+      // non-equi-join is not supported
+      if (isRevertNonEquiJoinSupport()) {
         joinCond = newJoinCond;
+      } else {
+        // non-equi-join need not convert cast
+        final JoinInfo info = JoinInfo.of(leftRel, rightRel, newJoinCond);
+        boolean isNonEquiJoin =
+                RelOptUtil.isNonEquiJoinRel(info, leftRel, rightRel, joinType, newJoinCond);
+        if (!isNonEquiJoin || (isNonEquiJoin && isConvertCastForNonEquiJoinEnabled())) {
+          joinCond = newJoinCond;
+        }
       }
     }
 
@@ -2582,6 +2588,10 @@ public class SqlToRelConverter {
             joinCond, ImmutableSet.<CorrelationId>of(), joinType, false);
 
     return RelOptUtil.pushDownJoinConditions(originalJoin, relBuilder);
+  }
+
+  private boolean isRevertNonEquiJoinSupport() {
+    return REVERT_NON_EQUI_JOIN_SUPPORT.get() != null && REVERT_NON_EQUI_JOIN_SUPPORT.get();
   }
 
   private boolean isConvertCastForNonEquiJoinEnabled() {

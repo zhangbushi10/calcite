@@ -182,6 +182,8 @@ public class CalcitePrepareImpl implements CalcitePrepare {
 
   public static final ThreadLocal<Boolean> CONVERT_CAST_FOR_NON_EQUI_JOIN = new ThreadLocal<>();
 
+  public static final ThreadLocal<Boolean> REVERT_NON_EQUI_JOIN_SUPPORT = new ThreadLocal<>();
+
   public static final boolean COMMUTE =
       Util.getBooleanProperty("calcite.enable.join.commute");
 
