@@ -17,11 +17,19 @@
 package org.apache.calcite.sql.dialect;
 
 import org.apache.calcite.config.NullCollation;
+import org.apache.calcite.sql.SqlBasicCall;
 import org.apache.calcite.sql.SqlCall;
 import org.apache.calcite.sql.SqlDialect;
+import org.apache.calcite.sql.SqlFunction;
+import org.apache.calcite.sql.SqlFunctionCategory;
+import org.apache.calcite.sql.SqlKind;
 import org.apache.calcite.sql.SqlNode;
+import org.apache.calcite.sql.SqlUtil;
 import org.apache.calcite.sql.SqlWriter;
+import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.fun.SqlSubstringFunction;
+import org.apache.calcite.sql.type.OperandTypes;
+import org.apache.calcite.sql.type.ReturnTypes;
 import org.apache.calcite.util.RelToSqlConverterUtil;
 
 /**
@@ -29,19 +37,26 @@ import org.apache.calcite.util.RelToSqlConverterUtil;
  */
 public class HiveSqlDialect extends SqlDialect {
   public static final SqlDialect DEFAULT =
-      new HiveSqlDialect(EMPTY_CONTEXT
-          .withDatabaseProduct(DatabaseProduct.HIVE)
-          .withNullCollation(NullCollation.LOW));
+          new HiveSqlDialect(EMPTY_CONTEXT
+                  .withDatabaseProduct(DatabaseProduct.HIVE)
+                  .withNullCollation(NullCollation.LOW));
 
   private final boolean emulateNullDirection;
 
-  /** Creates a HiveSqlDialect. */
+  private static final SqlFunction HIVE_PI =
+          new SqlFunction("PI", SqlKind.OTHER_FUNCTION,
+                  ReturnTypes.DOUBLE, null, OperandTypes.NILADIC,
+                  SqlFunctionCategory.NUMERIC);
+
+  /**
+   * Creates a HiveSqlDialect.
+   */
   public HiveSqlDialect(Context context) {
     super(context);
     // Since 2.1.0, Hive natively supports "NULLS FIRST" and "NULLS LAST".
     // See https://issues.apache.org/jira/browse/HIVE-12994.
     emulateNullDirection = (context.databaseMajorVersion() < 2)
-        || (context.databaseMajorVersion() == 2
+            || (context.databaseMajorVersion() == 2
             && context.databaseMinorVersion() < 1);
   }
 
@@ -80,6 +95,9 @@ public class HiveSqlDialect extends SqlDialect {
           call.operand(2).unparse(writer, leftPrec, rightPrec);
         }
         writer.endFunCall(funCallFrame);
+      } else if (call.getOperator() == SqlStdOperatorTable.PI) {
+        ((SqlBasicCall) call).setOperator(HIVE_PI);
+        SqlUtil.unparseFunctionSyntax(HIVE_PI, writer, call);
       } else {
         super.unparseCall(writer, call, leftPrec, rightPrec);
       }
