@@ -456,6 +456,34 @@ public abstract class ReturnTypes {
           return null;
         }
       };
+
+  /**
+   * return timestamp for date type
+   */
+  public static final SqlReturnTypeInference FLOOR_DATETIME_TO_TIMESTAMP =
+      new SqlReturnTypeInference() {
+        public RelDataType inferReturnType(SqlOperatorBinding opBinding) {
+          RelDataType type1 = opBinding.getOperandType(0);
+          if (SqlTypeUtil.isDatetime(type1)) {
+            RelDataType ret;
+            ret = opBinding.getTypeFactory().createSqlType(SqlTypeName.TIMESTAMP);
+            if (type1.isNullable()) {
+              ret = opBinding.getTypeFactory()
+                      .createTypeWithNullability(ret, true);
+            }
+            return ret;
+          }
+          return null;
+        }
+      };
+
+
+  /**
+   * Type-inference strategy for floor, ceiling
+   */
+  public static final SqlReturnTypeInferenceChain ARG0_OR_EXACT_NO_SCALE_OR_TIMESTAMP =
+          chain(DECIMAL_SCALE0, NUMERIC_TO_LONG, FLOOR_DATETIME_TO_TIMESTAMP, ARG0);
+
   /**
    * Type-inference strategy whereby the result type of a call is
    * {@link #DECIMAL_SCALE0} with a fallback to {@link #ARG0} This rule
