@@ -195,6 +195,7 @@ public class SqlSubstringFunction extends SqlFunction {
       final SqlMonotonicity mono0 = call.getOperandMonotonicity(0);
       if ((mono0 != SqlMonotonicity.NOT_MONOTONIC)
           && call.getOperandMonotonicity(1) == SqlMonotonicity.CONSTANT
+          && call.isOperandLiteral(1, false)
           && call.getOperandLiteralValue(1, BigDecimal.class)
               .equals(BigDecimal.ZERO)
           && call.getOperandMonotonicity(2) == SqlMonotonicity.CONSTANT) {
