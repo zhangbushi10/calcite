@@ -16,6 +16,7 @@
  */
 package org.apache.calcite.rel.type;
 
+import org.apache.calcite.prepare.CalcitePrepareImpl;
 import org.apache.calcite.sql.type.SqlTypeFamily;
 import org.apache.calcite.sql.type.SqlTypeName;
 
@@ -223,8 +224,10 @@ public abstract class RelDataTypeSystemImpl implements RelDataTypeSystem {
   @Override public RelDataType deriveAvgAggType(RelDataTypeFactory typeFactory,
       RelDataType argumentType) {
     if (SqlTypeFamily.INTEGER.getTypeNames().contains(argumentType.getSqlTypeName())) {
+      Integer scale = CalcitePrepareImpl.INTEGER_DIVIDE_INTEGER_SCALE.get();
       return typeFactory.createTypeWithNullability(
-              typeFactory.createSqlType(SqlTypeName.DECIMAL), false);
+              typeFactory.createSqlType(SqlTypeName.DECIMAL, 38, scale == null ? 16 : scale),
+              false);
     } else {
       return argumentType;
     }
